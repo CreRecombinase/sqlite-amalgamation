@@ -10,6 +10,9 @@ include(GNUInstallDirs)
 # build options and optional modules:
 option(SQLITE_ENABLE_DBSTAT_VTAB  "enables dbstat virtual table"                 OFF)
 option(SQLITE_ENABLE_FTS3         "enables full text searches version 3"         OFF)
+option(SQLITE_ENABLE_COLUMN_METADATA "provide convenient access to meta-data about tables and queries"         ON)
+option(SQLITE_ENABLE_STAT4 "enables stat4"         ON)
+option(SQLITE_USE_URI "enables uri"         ON)
 option(SQLITE_ENABLE_FTS4         "enables full text searches version 3 & 4"     OFF)
 option(SQLITE_ENABLE_FTS5         "enables full text searches version 5"         OFF)
 option(SQLITE_ENABLE_GEOPOLY      "enables Geopoly extention"                    OFF)
@@ -17,6 +20,7 @@ option(SQLITE_ENABLE_ICU          "enables international components for unicode"
 option(SQLITE_ENABLE_JSON1        "enables JSON SQL functins"                    ON)
 option(SQLITE_ENABLE_RBU          "enables resumable bulk update extension"      OFF)
 option(SQLITE_ENABLE_RTREE        "enables R*TRee index extension"               OFF)
+option(SQLITE_MAX_EXPR_DEPTH        "max expr depth"               10000)
 option(SQLITE_RECOMMENDED_OPTIONS "compile by SQLite3 recommended options"       ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -35,8 +39,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_compile_definitions(${PROJECT_NAME} PUBLIC # inject user's options
     $<BUILD_INTERFACE:
+        $<$<INTEGER:${SQLITE_MAX_EXPR_DEPTH}>:SQLITE_MAX_EXPR_DEPTH>   
         $<$<BOOL:${SQLITE_ENABLE_DBSTAT_VTAB}>:SQLITE_ENABLE_DBSTAT_VTAB>
         $<$<BOOL:${SQLITE_ENABLE_FTS3}>:SQLITE_ENABLE_FTS3>
+        $<$<BOOL:${SQLITE_ENABLE_COLUMN_METADATA}>:SQLITE_ENABLE_COLUMN_METADATA>
+        $<$<BOOL:${SQLITE_ENABLE_STAT4}>:SQLITE_ENABLE_STAT4>
+        $<$<BOOL:${SQLITE_USE_URI}>:SQLITE_USE_URI>
         $<$<BOOL:${SQLITE_ENABLE_FTS4}>:SQLITE_ENABLE_FTS4>
         $<$<BOOL:${SQLITE_ENABLE_FTS5}>:SQLITE_ENABLE_FTS5>
         $<$<BOOL:${SQLITE_ENABLE_GEOPOLY}>:SQLITE_ENABLE_GEOPOLY>
@@ -49,7 +57,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC # inject user's options
             SQLITE_DEFAULT_MEMSTATUS=0
             SQLITE_DEFAULT_WAL_SYNCHRONOUS=1
             SQLITE_LIKE_DOESNT_MATCH_BLOBS
-            SQLITE_MAX_EXPR_DEPTH=0
             SQLITE_OMIT_DECLTYPE
             SQLITE_OMIT_DEPRECATED
             SQLITE_OMIT_PROGRESS_CALLBACK
